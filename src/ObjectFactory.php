@@ -52,7 +52,7 @@ abstract class ObjectFactory extends Factory
      */
     public static function new(array|callable|string $defaultAttributes = [], string ...$states): static
     {
-        if (is_string($defaultAttributes) || count($states)) {
+        if (\is_string($defaultAttributes) || \count($states)) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Passing states as strings to "Factory::new()" is deprecated and will throw an exception in Foundry 2.0.');
         }
 
