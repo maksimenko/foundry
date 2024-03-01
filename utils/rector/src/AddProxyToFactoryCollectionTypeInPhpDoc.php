@@ -16,6 +16,7 @@ use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
 use Rector\Rector\AbstractRector;
 use Rector\StaticTypeMapper\StaticTypeMapper;
+use Rector\StaticTypeMapper\ValueObject\Type\AliasedObjectType;
 use Rector\StaticTypeMapper\ValueObject\Type\FullyQualifiedObjectType;
 use Rector\StaticTypeMapper\ValueObject\Type\ShortenedObjectType;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -94,13 +95,27 @@ final class AddProxyToFactoryCollectionTypeInPhpDoc extends AbstractRector
                 || !($genericTypeNode = $phpDocChildNode->value->type) instanceof GenericTypeNode
                 || !str_contains((string)$phpDocChildNode, 'FactoryCollection<')
                 || count($genericTypeNode->genericTypes) !== 1
-                || $genericTypeNode->genericTypes[0] instanceof GenericTypeNode
             ) {
                 continue;
             }
 
             // assert we really have a `FactoryCollection` from foundry
             if ($this->getFullyQualifiedClassName($genericTypeNode->type, $node) !== FactoryCollection::class) {
+                continue;
+            }
+
+            // handle case FactoryCollection<Proxy<NotPersisted>>
+            if (($factoryGenericType = $genericTypeNode->genericTypes[0]) instanceof GenericTypeNode) {
+                if (count($factoryGenericType->genericTypes) === 1) {
+                    $proxy = $this->getFullyQualifiedClassName($factoryGenericType->type, $node);
+                    $proxyTargetClassName = $this->getFullyQualifiedClassName($factoryGenericType->genericTypes[0], $node);
+
+                    if (is_a($proxy, Proxy::class, allow_string: true) && !$this->persistenceResolver->shouldUseProxyFactory($proxyTargetClassName)) {
+                        $hasChanged = true;
+                        $phpDocChildNode->value->type->genericTypes = [new IdentifierTypeNode('\\'.$proxyTargetClassName)];
+                    }
+                }
+
                 continue;
             }
 
@@ -130,7 +145,7 @@ final class AddProxyToFactoryCollectionTypeInPhpDoc extends AbstractRector
 
         return match ($type::class) {
             FullyQualifiedObjectType::class => $type->getClassName(),
-            ShortenedObjectType::class => $type->getFullyQualifiedName(),
+            ShortenedObjectType::class, AliasedObjectType::class => $type->getFullyQualifiedName(),
             default => null,
         };
     }
