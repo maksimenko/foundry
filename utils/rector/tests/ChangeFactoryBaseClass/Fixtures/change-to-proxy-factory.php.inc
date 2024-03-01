@@ -15,8 +15,9 @@ use Zenstruck\Foundry\RepositoryProxy;
  * @method static RepositoryProxy repository()
  * @method        DummyPersistentObject|Proxy create(array|callable $attributes = [])
  *
- * @phpstan-method Proxy<DummyPersistentObject> create(array|callable $attributes = [])
+ * @phpstan-method Proxy&DummyPersistentObject create(array|callable $attributes = [])
  * @phpstan-method static Proxy<DummyPersistentObject> createOne(array $attributes = [])
+ * @phpstan-method static DummyPersistentObject[]&Proxy[] all()
  * @phpstan-method static RepositoryProxy<DummyPersistentObject> repository()
  */
 final class DummyPersistentModelFactory extends ModelFactory
@@ -56,8 +57,9 @@ use Zenstruck\Foundry\RepositoryProxy;
  * @method static \Zenstruck\Foundry\Persistence\RepositoryDecorator repository()
  * @method        DummyPersistentObject|Proxy create(array|callable $attributes = [])
  *
- * @phpstan-method Proxy<DummyPersistentObject> create(array|callable $attributes = [])
+ * @phpstan-method Proxy<DummyPersistentObject> create((array | callable) $attributes = [])
  * @phpstan-method static Proxy<DummyPersistentObject> createOne(array $attributes = [])
+ * @phpstan-method static list<Proxy<DummyPersistentObject>> all()
  * @phpstan-method static \Zenstruck\Foundry\Persistence\RepositoryDecorator<DummyPersistentObject> repository()
  */
 final class DummyPersistentModelFactory extends \Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory

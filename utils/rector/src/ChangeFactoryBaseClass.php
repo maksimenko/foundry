@@ -229,6 +229,7 @@ final class ChangeFactoryBaseClass extends AbstractRector
         }
 
         $phpDocNode = $phpDocInfo->getPhpDocNode();
+        $targetClassName = null;
         foreach ($phpDocNode->children as $phpDocChildNode) {
             if (!$phpDocChildNode instanceof PhpDocTagNode
                 || $phpDocChildNode->name !== '@extends'
@@ -239,6 +240,7 @@ final class ChangeFactoryBaseClass extends AbstractRector
             }
 
             $phpDocChildNode->value->type->type = new IdentifierTypeNode($newFactoryClass);
+            $targetClassName = $phpDocChildNode->value->type->genericTypes[0]->name;
             break;
         }
 
@@ -256,6 +258,29 @@ final class ChangeFactoryBaseClass extends AbstractRector
 
             foreach ($methodNodes as $methodNode) {
                 if (!str_contains((string) $methodNode->returnType, 'RepositoryProxy')) {
+                    if (!$targetClassName) {
+                        continue;
+                    }
+
+                    // change old proxy notation to generic ones:
+                    // - @phpstan-method Event&Proxy create(array|callable $attributes = [])
+                    // - @phpstan-method static Event[]&Proxy[] all()
+                    // + @phpstan-method Proxy<Event> create((array | callable) $attributes = [])
+                    // + @phpstan-method static list<Proxy<Event>> all()
+                    if (str_contains((string) $methodNode->returnType, '&')) {
+                        $parentNode = $methodNode->getAttribute('parent');
+                        if (str_contains((string) $parentNode, 'phpstan') || str_contains((string) $parentNode, 'psalm')) {
+                            if (str_contains((string) $methodNode->returnType, '[]')) {
+                                $methodNode->returnType = new GenericTypeNode(
+                                    new IdentifierTypeNode('list'),
+                                    [new GenericTypeNode(new IdentifierTypeNode('Proxy'), [new IdentifierTypeNode($targetClassName)])]
+                                );
+                            } else {
+                                $methodNode->returnType = new GenericTypeNode(new IdentifierTypeNode('Proxy'), [new IdentifierTypeNode($targetClassName)]);
+                            }
+                        }
+                    }
+
                     continue;
                 }
 
