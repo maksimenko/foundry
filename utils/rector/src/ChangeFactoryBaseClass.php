@@ -9,6 +9,7 @@ use PhpParser\Node\Stmt\Class_;
 use PHPStan\Analyser\MutatingScope;
 use PHPStan\PhpDocParser\Ast\PhpDoc\ExtendsTagValueNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueNode;
+use PHPStan\PhpDocParser\Ast\PhpDoc\MethodTagValueParameterNode;
 use PHPStan\PhpDocParser\Ast\PhpDoc\PhpDocTagNode;
 use PHPStan\PhpDocParser\Ast\Type\GenericTypeNode;
 use PHPStan\PhpDocParser\Ast\Type\IdentifierTypeNode;
@@ -16,6 +17,7 @@ use PHPStan\PhpDocParser\Ast\Type\UnionTypeNode;
 use PHPStan\Type\ObjectType;
 use Rector\BetterPhpDocParser\PhpDocInfo\PhpDocInfoFactory;
 use Rector\BetterPhpDocParser\PhpDocManipulator\PhpDocTagRemover;
+use Rector\BetterPhpDocParser\ValueObject\Type\BracketsAwareUnionTypeNode;
 use Rector\Comments\NodeDocBlock\DocBlockUpdater;
 use Rector\Rector\AbstractRector;
 use Symplify\RuleDocGenerator\ValueObject\CodeSample\CodeSample;
@@ -267,7 +269,7 @@ final class ChangeFactoryBaseClass extends AbstractRector
                     // - @phpstan-method static Event[]&Proxy[] all()
                     // + @phpstan-method Proxy<Event> create((array | callable) $attributes = [])
                     // + @phpstan-method static list<Proxy<Event>> all()
-                    if (str_contains((string) $methodNode->returnType, '&')) {
+                    if (str_contains((string) $methodNode->returnType, '&') && !str_contains((string) $methodNode->returnType, 'FactoryCollection')) {
                         $parentNode = $methodNode->getAttribute('parent');
                         if (str_contains((string) $parentNode, 'phpstan') || str_contains((string) $parentNode, 'psalm')) {
                             if (str_contains((string) $methodNode->returnType, '[]')) {
@@ -277,6 +279,14 @@ final class ChangeFactoryBaseClass extends AbstractRector
                                 );
                             } else {
                                 $methodNode->returnType = new GenericTypeNode(new IdentifierTypeNode('Proxy'), [new IdentifierTypeNode($targetClassName)]);
+                            }
+
+                            // handle case for @method parameter is UnionType
+                            // this prevents to render it with brackets, which creates parsing error
+                            foreach ($methodNode->parameters as $parameter) {
+                                if ($parameter instanceof MethodTagValueParameterNode && $parameter->type instanceof UnionTypeNode) {
+                                    $parameter->type = new BracketsAwareUnionTypeNode($parameter->type->types);
+                                }
                             }
                         }
                     }

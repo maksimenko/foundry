@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Zenstruck\Foundry\Utils\Rector;
 
+use Doctrine\ODM\MongoDB\DocumentManager;
 use PHPStan\Type\Doctrine\ObjectMetadataResolver;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\ObjectFactory;
@@ -60,6 +61,15 @@ final class PersistenceResolver
 
     private function isPersisted(string $targetClass): bool
     {
-        return (bool) $this->doctrineMetadataResolver->getClassMetadata($targetClass);
+        $isPersisted = (bool)$this->doctrineMetadataResolver->getClassMetadata($targetClass);
+
+        if ($isPersisted || !class_exists(DocumentManager::class)) {
+            return $isPersisted;
+        }
+
+        // phpstan/phpstan-doctrine does not allow to determine if a class is managed by ODM
+        // so let's do a "best effort" et check if the class has a doctrine attribute
+        return (new \ReflectionClass($targetClass))->getAttributes(\Doctrine\ODM\MongoDB\Mapping\Annotations\Document::class)
+            || (new \ReflectionClass($targetClass))->getAttributes(\Doctrine\ODM\MongoDB\Mapping\Annotations\MappedSuperclass::class);
     }
 }

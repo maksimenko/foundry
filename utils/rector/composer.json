@@ -23,7 +23,8 @@
         "zenstruck/foundry": "dev-1.x-bc",
         "symfony/var-dumper": "^7.0",
         "doctrine/orm": "^2.17",
-        "symfony/framework-bundle": "^7.0"
+        "symfony/framework-bundle": "^7.0",
+        "doctrine/mongodb-odm": "^2.6"
     },
     "require": {
         "symfony/cache": "^7.0"
