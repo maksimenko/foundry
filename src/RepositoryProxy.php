@@ -31,6 +31,8 @@ if (false) {
      * @mixin EntityRepository<TProxiedObject>
      * @template TProxiedObject of object
      *
+     * @extends RepositoryDecorator<TProxiedObject>
+     *
      * @deprecated
      *
      * @author Kevin Bond <kevinbond@gmail.com>

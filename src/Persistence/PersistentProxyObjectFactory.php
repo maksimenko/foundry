@@ -15,6 +15,8 @@ namespace Zenstruck\Foundry\Persistence;
 
 use Zenstruck\Foundry\Exception\FoundryBootException;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\FactoryCollection;
+use Zenstruck\Foundry\Proxy;
 
 /**
  * @template TModel of object
@@ -22,6 +24,12 @@ use Zenstruck\Foundry\Factory;
  *
  * @method static Proxy[]|TModel[] createMany(int $number, array|callable $attributes = [])
  * @phpstan-method static list<Proxy<TModel>> createMany(int $number, array|callable $attributes = [])
+ *
+ * @phpstan-method FactoryCollection<Proxy<TModel>> sequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method FactoryCollection<Proxy<TModel>> many(int $min, int|null $max = null)
+ *
+ * @phpstan-method static list<Proxy<TModel>> createSequence(iterable<array<string, mixed>>|callable(): iterable<array<string, mixed>> $sequence)
+ * @phpstan-method static list<Proxy<TModel>> createMany(int $min, int|null $max = null)
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  */

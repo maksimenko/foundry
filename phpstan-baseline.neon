@@ -6,6 +6,26 @@ parameters:
 			path: src/AnonymousFactoryGenerator.php
 
 		-
+			message: "#^Cannot access offset 'fieldName' on array\\{type\\: string, fieldName\\: string, columnName\\: string, length\\?\\: int, id\\?\\: bool, nullable\\?\\: bool, notInsertable\\?\\: bool, notUpdatable\\?\\: bool, \\.\\.\\.\\}\\|Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\FieldMapping\\.$#"
+			count: 1
+			path: src/Bundle/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
+
+		-
+			message: "#^Cannot access offset 'type' on array\\{type\\: string, fieldName\\: string, columnName\\: string, length\\?\\: int, id\\?\\: bool, nullable\\?\\: bool, notInsertable\\?\\: bool, notUpdatable\\?\\: bool, \\.\\.\\.\\}\\|Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\FieldMapping\\.$#"
+			count: 1
+			path: src/Bundle/Maker/Factory/DoctrineScalarFieldsDefaultPropertiesGuesser.php
+
+		-
+			message: "#^Access to offset 'fieldName' on an unknown class Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\AssociationFieldMapping\\.$#"
+			count: 1
+			path: src/Bundle/Maker/Factory/ODMDefaultPropertiesGuesser.php
+
+		-
+			message: "#^Access to offset 'targetDocument' on an unknown class Doctrine\\\\ODM\\\\MongoDB\\\\Mapping\\\\AssociationFieldMapping\\.$#"
+			count: 1
+			path: src/Bundle/Maker/Factory/ODMDefaultPropertiesGuesser.php
+
+		-
 			message: "#^Parameter \\#1 \\$class of method Doctrine\\\\Persistence\\\\ManagerRegistry\\:\\:getManagerForClass\\(\\) expects class\\-string, string given\\.$#"
 			count: 1
 			path: src/Configuration.php
@@ -69,6 +89,61 @@ parameters:
 			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
 			path: src/ObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:all\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:create\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:find\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:findBy\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:findOrCreate\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:first\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:last\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:random\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:randomOrCreate\\(\\) should return Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\> but returns Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:randomRange\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
+
+		-
+			message: "#^Method Zenstruck\\\\Foundry\\\\Persistence\\\\PersistentProxyObjectFactory\\:\\:randomSet\\(\\) should return array\\<int, Zenstruck\\\\Foundry\\\\Proxy\\<TModel of object\\>\\> but returns array\\<int, Zenstruck\\\\Foundry\\\\Persistence\\\\Proxy\\<TModel of object\\>\\>\\.$#"
+			count: 1
+			path: src/Persistence/PersistentProxyObjectFactory.php
 
 		-
 			message: "#^Should not use function \"debug_backtrace\", please change the code\\.$#"
