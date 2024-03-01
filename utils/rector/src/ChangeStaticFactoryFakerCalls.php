@@ -46,7 +46,7 @@ final class ChangeStaticFactoryFakerCalls extends AbstractRector
     public function refactor(Node $node): Node|int|null
     {
         // if method name is not faker, then do nothing
-        if ((string)$node->name !== 'faker') {
+        if ($this->getName($node->name) !== 'faker') {
             return null;
         }
 

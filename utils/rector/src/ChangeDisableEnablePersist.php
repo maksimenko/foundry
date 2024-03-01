@@ -94,12 +94,12 @@ final class ChangeDisableEnablePersist extends AbstractRector
         }
 
         if ($this->isCallOnThisInPhpUnitTestCase($expr)) {
-            return match ((string)$expr->name) {
+            return match ($this->getName($expr->name)) {
                 'disablePersist', 'enablePersist' => NodeTraverser::REMOVE_NODE,
                 default => null,
             };
         } elseif ($this->isCallOnThisInPhpUnitKernelTestCase($expr)) {
-            return match ((string)$expr->name) {
+            return match ($this->getName($expr->name)) {
                 'disablePersist' => new Node\Stmt\Expression(
                     new Node\Expr\FuncCall(
                         new Node\Name('\Zenstruck\Foundry\Persistence\disable_persisting'), $node->expr->args

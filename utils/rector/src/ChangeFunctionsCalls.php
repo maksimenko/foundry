@@ -70,7 +70,7 @@ final class ChangeFunctionsCalls extends AbstractRector
             return null;
         }
 
-        $name = $node->name->getAttribute('namespacedName') ?? (string)$node->name;
+        $name = $node->name->getAttribute('namespacedName') ?? $this->getName($node->name);
 
         switch ($name) {
             case 'Zenstruck\Foundry\create':
@@ -91,7 +91,7 @@ final class ChangeFunctionsCalls extends AbstractRector
     {
         if (
             $node->name instanceof Identifier
-            && (string)$node->name === 'delayFlush'
+            && $this->getName($node->name) === 'delayFlush'
             && $node->class instanceof Node\Name
             && is_a((string)$node->class, Factory::class, allow_string: true)
         ) {
@@ -100,7 +100,7 @@ final class ChangeFunctionsCalls extends AbstractRector
 
         if (
             $node->name instanceof Identifier
-            && (string)$node->name === 'configure'
+            && $this->getName($node->name) === 'configure'
             && $node->class instanceof Node\Name
             && (string)$node->class === TestState::class
         ) {

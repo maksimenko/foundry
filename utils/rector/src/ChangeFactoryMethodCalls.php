@@ -91,13 +91,13 @@ final class ChangeFactoryMethodCalls extends AbstractRector
             return null;
         }
 
-        if (in_array((string)$node->name, ['addState', 'withAttributes'], true)) {
+        if (in_array($this->getName($node->name), ['addState', 'withAttributes'], true)) {
             $node->name = new Node\Identifier('with');
 
             return $node;
         }
 
-        if ((string)$node->name === 'withoutPersisting') {
+        if ($this->getName($node->name) === 'withoutPersisting') {
             $type = $this->getType($node->var);
             $classes = $type->getObjectClassNames();
             if (\count($classes) === 1 &&  $this->persistenceResolver->shouldTransformFactoryIntoObjectFactory($classes[0])) {
@@ -116,7 +116,7 @@ final class ChangeFactoryMethodCalls extends AbstractRector
             return null;
         }
 
-        if ((string)$node->name === 'getDefaults') {
+        if ($this->getName($node->name) === 'getDefaults') {
             $node->name = new Node\Identifier('defaults');
 
             return $node;

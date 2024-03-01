@@ -67,7 +67,7 @@ final class ChangeProxyMethodCalls extends AbstractRector
             return null;
         }
 
-        switch((string)$node->name){
+        switch($this->getName($node->name)){
             case 'object':
                 $node->name = new Node\Identifier('_real');
                 return $node;

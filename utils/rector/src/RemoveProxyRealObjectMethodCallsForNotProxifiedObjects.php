@@ -58,12 +58,12 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
      */
     public function refactor(Node $node): ?Node
     {
-        if (!in_array((string)$node->name, ['object', '_real'], true)) {
+        if (!in_array($this->getName($node->name), ['object', '_real'], true)) {
             return null;
         }
 
         if ($node->var instanceof Node\Expr\FuncCall) {
-            $name = $node->var->name->getAttribute('namespacedName') ?? (string)$node->var->name;
+            $name = $node->var->name->getAttribute('namespacedName') ?? $this->getName($node->var->name);
             if (str_starts_with($name, '\\')) {
                 $name = substr($name, 1);
             }
@@ -148,7 +148,7 @@ final class RemoveProxyRealObjectMethodCallsForNotProxifiedObjects extends Abstr
         }
 
         try {
-            (new \ReflectionClass($type->getClassName()))->getMethod((string)$node->name);
+            (new \ReflectionClass($type->getClassName()))->getMethod($this->getName($node->name));
 
             return false;
         } catch (\ReflectionException) {

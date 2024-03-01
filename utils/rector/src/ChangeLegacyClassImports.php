@@ -58,7 +58,7 @@ final class ChangeLegacyClassImports extends AbstractRector
      */
     public function refactor(Node $node): ?Node
     {
-        switch((string)$node->name){
+        switch($this->getName($node->name)){
             case \Zenstruck\Foundry\Proxy::class:
                 $node->name = new Node\Name(Proxy::class);
                 return $node;

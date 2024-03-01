@@ -68,7 +68,7 @@ final class ChangeInstantiatorMethodCalls extends AbstractScopeAwareRector
             return null;
         }
 
-        switch((string)$node->name){
+        switch($this->getName($node->name)){
             case 'allowExtraAttributes':
                 $node->name = new Node\Identifier('allowExtra');
                 if (count($node->args) === 1) {
