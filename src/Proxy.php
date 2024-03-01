@@ -154,21 +154,10 @@ final class Proxy implements \Stringable, ProxyBase
             return $this->object;
         }
 
-        $om = $this->objectManager();
-
-        // only check for changes if the object is managed in the current om
-        if (($om instanceof EntityManagerInterface || $om instanceof DocumentManager) && $om->contains($this->object)) {
-            // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
-            $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
-
-            if (
-                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object)))
-                || ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
-                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
-            }
+        try {
+            $this->_refresh();
+        } catch (\Throwable) {
         }
-
-        $this->_refresh();
 
         return $this->object;
     }
@@ -236,6 +225,20 @@ final class Proxy implements \Stringable, ProxyBase
             throw new \RuntimeException(\sprintf('Cannot refresh unpersisted object (%s).', $this->class));
         }
 
+        $om = $this->objectManager();
+
+        // only check for changes if the object is managed in the current om
+        if (($om instanceof EntityManagerInterface || $om instanceof DocumentManager) && $om->contains($this->object)) {
+            // cannot use UOW::recomputeSingleEntityChangeSet() here as it wrongly computes embedded objects as changed
+            $om->getUnitOfWork()->computeChangeSet($om->getClassMetadata($this->class), $this->object);
+
+            if (
+                ($om instanceof EntityManagerInterface && !empty($om->getUnitOfWork()->getEntityChangeSet($this->object)))
+                || ($om instanceof DocumentManager && !empty($om->getUnitOfWork()->getDocumentChangeSet($this->object)))) {
+                throw new \RuntimeException(\sprintf('Cannot auto refresh "%s" as there are unsaved changes. Be sure to call ->save() or disable auto refreshing (see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh for details).', $this->class));
+            }
+        }
+
         if ($this->objectManager()->contains($this->object)) {
             $this->objectManager()->refresh($this->object);
 
@@ -263,6 +266,7 @@ final class Proxy implements \Stringable, ProxyBase
 
     public function _set(string $property, mixed $value): static
     {
+        $this->_refresh();
         $object = $this->_real();
 
         Instantiator::forceSet($object, $property, $value, calledInternally: true);

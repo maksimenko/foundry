@@ -27,6 +27,7 @@ final class Configuration implements ConfigurationInterface
         $treeBuilder->getRootNode()
             ->children()
                 ->booleanNode('auto_refresh_proxies')
+                    ->setDeprecated('zenstruck/foundry', '1.37.0', 'The option "zenstruck_foundry.auto_refresh_proxies" is deprecated, you should remove it.')
                     ->info('Whether to auto-refresh proxies by default (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#auto-refresh)')
                     ->defaultNull()
                 ->end()

@@ -154,29 +154,6 @@ abstract class ProxyTest extends KernelTestCase
     /**
      * @test
      */
-    public function exception_thrown_if_trying_to_autorefresh_object_with_unsaved_changes(): void
-    {
-        $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body'])
-            ->_enableAutoRefresh()
-        ;
-
-        $this->assertSame('old title', $post->getTitle());
-        $this->assertSame('old body', $post->getBody());
-
-        $post
-            ->_enableAutoRefresh()
-            ->_set('title', 'new title')
-        ;
-
-        $this->expectException(\RuntimeException::class);
-
-        // exception thrown because of "unsaved changes" to $post from above
-        $post->_set('body', 'new body');
-    }
-
-    /**
-     * @test
-     */
     public function can_autorefresh_between_kernel_boots(): void
     {
         $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body'])
