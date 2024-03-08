@@ -20,7 +20,6 @@ use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @deprecated Typehint Zenstruck\Foundry\Persistence\Proxy instead
@@ -304,6 +303,7 @@ final class Proxy implements \Stringable, ProxyBase
     public function _get(string $property): mixed
     {
         $this->_autoRefresh();
+
         return Instantiator::forceGet($this->_real(), $property, calledInternally: true);
     }
 

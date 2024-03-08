@@ -14,7 +14,6 @@ namespace Zenstruck\Foundry;
 use Faker;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Proxy as ProxyObject;
 
 use function Zenstruck\Foundry\Persistence\persist_proxy;

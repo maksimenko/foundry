@@ -18,7 +18,6 @@ use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
-use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
  * @internal
