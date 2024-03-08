@@ -17,6 +17,7 @@ use Zenstruck\Foundry\Factory;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
@@ -48,7 +49,7 @@ final class MakeFactoryData
 
         if ($repository) {
             $this->uses[] = $repository->getName();
-            $this->uses[] = RepositoryDecorator::class;
+            $this->uses[] = ProxyRepositoryDecorator::class;
         }
 
         $this->methodsInPHPDoc = MakeFactoryPHPDocMethod::createAll($this);

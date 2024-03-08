@@ -38,9 +38,9 @@ interface Proxy
     public function _get(string $property): mixed;
 
     /**
-     * @return RepositoryDecorator<TProxiedObject>
+     * @return ProxyRepositoryDecorator<TProxiedObject>
      */
-    public function _repository(): RepositoryDecorator;
+    public function _repository(): ProxyRepositoryDecorator;
 
     public function _enableAutoRefresh(): static;
 

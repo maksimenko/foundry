@@ -39,7 +39,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     {
         try {
             if ($found = static::repository()->find($attributes)) {
-                return $found->_real();
+                return $found;
             }
         } catch (FoundryBootException) {
         }
@@ -58,11 +58,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function first(string $sortedField = 'id'): object
     {
-        if (null === $proxy = static::repository()->first($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-        }
-
-        return $proxy->_real();
+        return static::repository()->first($sortedField) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
     }
 
     /**
@@ -76,11 +72,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function last(string $sortedField = 'id'): object
     {
-        if (null === $proxy = static::repository()->last($sortedField)) {
-            throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
-        }
-
-        return $proxy->_real();
+        return static::repository()->last($sortedField) ?? throw new \RuntimeException(\sprintf('No "%s" objects persisted.', static::class()));
     }
 
     /**
@@ -92,7 +84,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function random(array $attributes = []): object
     {
-        return static::repository()->random($attributes)->_real();
+        return static::repository()->random($attributes);
     }
 
     /**
@@ -105,7 +97,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
     public static function randomOrCreate(array $attributes = []): object
     {
         try {
-            return static::repository()->random($attributes)->_real();
+            return static::repository()->random($attributes);
         } catch (\RuntimeException) {
             return static::new()->create($attributes, noProxy: true);
         }
@@ -120,7 +112,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function randomSet(int $number, array $attributes = []): array
     {
-        return self::unproxy(static::repository()->randomSet($number, $attributes));
+        return static::repository()->randomSet($number, $attributes);
     }
 
     /**
@@ -132,7 +124,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function randomRange(int $min, int $max, array $attributes = []): array
     {
-        return self::unproxy(static::repository()->randomRange($min, $max, $attributes));
+        return static::repository()->randomRange($min, $max, $attributes);
     }
 
     /**
@@ -160,7 +152,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function all(): array
     {
-        return self::unproxy(static::repository()->findAll());
+        return static::repository()->findAll();
     }
 
     /**
@@ -176,11 +168,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function find($criteria): object
     {
-        if (null === $proxy = static::repository()->find($criteria)) {
-            throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::class()));
-        }
-
-        return $proxy->_real();
+        return static::repository()->find($criteria) ?? throw new \RuntimeException(\sprintf('Could not find "%s" object.', static::class()));
     }
 
     /**
@@ -192,7 +180,7 @@ abstract class PersistentObjectFactory extends ObjectFactory
      */
     public static function findBy(array $attributes): array
     {
-        return self::unproxy(static::repository()->findBy($attributes));
+        return static::repository()->findBy($attributes);
     }
 
     final public static function assert(): RepositoryAssertions
@@ -206,21 +194,11 @@ abstract class PersistentObjectFactory extends ObjectFactory
 
     /**
      * @phpstan-return RepositoryDecorator<TModel>
+     *
+     * @final
      */
-    final public static function repository(): RepositoryDecorator
+    public static function repository(): RepositoryDecorator
     {
-        return static::configuration()->repositoryFor(static::class());
-    }
-
-    /**
-     * @param  list<Proxy<TModel>> $proxies
-     * @return list<TModel>
-     */
-    private static function unproxy(array $proxies): array
-    {
-        return \array_map(
-            static fn(Proxy $proxy) => $proxy->_real(),
-            $proxies,
-        );
+        return static::configuration()->repositoryFor(static::class(), proxy: false);
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the zenstruck/foundry package.
  *
@@ -24,78 +22,162 @@ use Doctrine\Persistence\ObjectManager;
 use Doctrine\Persistence\ObjectRepository;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Zenstruck\Foundry\Factory;
+use Zenstruck\Foundry\Proxy as ProxyObject;
 
 /**
- * @mixin EntityRepository<TObject>
- * @template TObject of object
+ * @mixin EntityRepository<TProxiedObject>
+ * @extends RepositoryDecorator<TProxiedObject>
+ * @template TProxiedObject of object
  *
  * @author Kevin Bond <kevinbond@gmail.com>
  *
  * @final
  */
-class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Countable
+class ProxyRepositoryDecorator extends RepositoryDecorator
 {
     /**
-     * @param ObjectRepository<TObject> $repository
-     */
-    public function __construct(private ObjectRepository $repository)
-    {
-    }
-
-    /**
-     * @return list<TObject>|TObject
+     * @return list<Proxy<TProxiedObject>>|Proxy<TProxiedObject>
      */
     public function __call(string $method, array $arguments)
     {
-        return $this->repository->{$method}(...$arguments);
-    }
-
-    /**
-     * @return ObjectRepository<TObject>
-     */
-    public function inner(): ObjectRepository
-    {
-        return $this->repository;
-    }
-
-    public function count(array $criteria = []): int
-    {
-        if ($this->repository instanceof EntityRepository) {
-            // use query to avoid loading all entities
-            return $this->repository->count($criteria);
-        }
-
-        return \count($this->findBy($criteria));
+        return $this->proxyResult($this->inner()->{$method}(...$arguments));
     }
 
     public function getIterator(): \Traversable
     {
-        // TODO: $this->repository is set to ObjectRepository, which is not
+        // TODO: $this->inner() is set to ObjectRepository, which is not
         //       iterable. Can this every be another RepositoryDecorator?
-        if (\is_iterable($this->repository)) {
-            return yield from $this->repository;
+        if (\is_iterable($this->inner())) {
+            return yield from $this->inner();
         }
 
         yield from $this->findAll();
     }
 
-    public function assert(): RepositoryAssertions
+    /**
+     * @deprecated use RepositoryDecorator::count()
+     */
+    public function getCount(): int
     {
-        return new RepositoryAssertions($this);
+        trigger_deprecation('zenstruck\foundry', '1.5.0', 'Using RepositoryDecorator::getCount() is deprecated, use RepositoryDecorator::count() (it is now Countable).');
+
+        return $this->count();
     }
 
     /**
-     * @return TObject|null
+     * @deprecated use RepositoryDecorator::assert()->empty()
      */
-    public function first(string $sortedField = 'id'): ?object
+    public function assertEmpty(string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertEmpty() is deprecated, use RepositoryDecorator::assert()->empty().');
+
+        $this->assert()->empty($message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->count()
+     */
+    public function assertCount(int $expectedCount, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertCount() is deprecated, use RepositoryDecorator::assert()->count().');
+
+        $this->assert()->count($expectedCount, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->countGreaterThan()
+     */
+    public function assertCountGreaterThan(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertCountGreaterThan() is deprecated, use RepositoryDecorator::assert()->countGreaterThan().');
+
+        $this->assert()->countGreaterThan($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->countGreaterThanOrEqual()
+     */
+    public function assertCountGreaterThanOrEqual(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertCountGreaterThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countGreaterThanOrEqual().');
+
+        $this->assert()->countGreaterThanOrEqual($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->countLessThan()
+     */
+    public function assertCountLessThan(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertCountLessThan() is deprecated, use RepositoryDecorator::assert()->countLessThan().');
+
+        $this->assert()->countLessThan($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->countLessThanOrEqual()
+     */
+    public function assertCountLessThanOrEqual(int $expected, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertCountLessThanOrEqual() is deprecated, use RepositoryDecorator::assert()->countLessThanOrEqual().');
+
+        $this->assert()->countLessThanOrEqual($expected, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->exists()
+     * @phpstan-param Proxy<TProxiedObject>|array|mixed $criteria
+     */
+    public function assertExists($criteria, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertExists() is deprecated, use RepositoryDecorator::assert()->exists().');
+
+        $this->assert()->exists($criteria, $message);
+
+        return $this;
+    }
+
+    /**
+     * @deprecated use RepositoryDecorator::assert()->notExists()
+     * @phpstan-param Proxy<TProxiedObject>|array|mixed $criteria
+     */
+    public function assertNotExists($criteria, string $message = ''): self
+    {
+        trigger_deprecation('zenstruck\foundry', '1.8.0', 'Using RepositoryDecorator::assertNotExists() is deprecated, use RepositoryDecorator::assert()->notExists().');
+
+        $this->assert()->notExists($criteria, $message);
+
+        return $this;
+    }
+
+    /**
+     * @return (Proxy&TProxiedObject)|null
+     *
+     * @phpstan-return Proxy<TProxiedObject>|null
+     */
+    public function first(string $sortedField = 'id'): ?Proxy
     {
         return $this->findBy([], [$sortedField => 'ASC'], 1)[0] ?? null;
     }
 
     /**
-     * @return TObject|null
+     * @return (Proxy&TProxiedObject)|null
+     *
+     * @phpstan-return Proxy<TProxiedObject>|null
      */
-    public function last(string $sortedField = 'id'): ?object
+    public function last(string $sortedField = 'id'): ?Proxy
     {
         return $this->findBy([], [$sortedField => 'DESC'], 1)[0] ?? null;
     }
@@ -123,11 +205,13 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      *
      * @param array $attributes The findBy criteria
      *
-     * @return TObject
+     * @return Proxy&TProxiedObject
      *
      * @throws \RuntimeException if no objects are persisted
+     *
+     * @phpstan-return Proxy<TProxiedObject>
      */
-    public function random(array $attributes = []): object
+    public function random(array $attributes = []): Proxy
     {
         return $this->randomSet(1, $attributes)[0];
     }
@@ -138,7 +222,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      * @param int   $number     The number of objects to return
      * @param array $attributes The findBy criteria
      *
-     * @return list<TObject>
+     * @return list<Proxy<TProxiedObject>>
      *
      * @throws \RuntimeException         if not enough persisted objects to satisfy the number requested
      * @throws \InvalidArgumentException if number is less than zero
@@ -159,7 +243,7 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
      * @param int   $max        The maximum number of objects to return
      * @param array $attributes The findBy criteria
      *
-     * @return list<TObject>
+     * @return list<Proxy<TProxiedObject>>
      *
      * @throws \RuntimeException         if not enough persisted objects to satisfy the max
      * @throws \InvalidArgumentException if min is less than zero
@@ -189,10 +273,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     /**
      * @param object|array|mixed $criteria
      *
-     * @return TObject|null
+     * @return (Proxy&TProxiedObject)|null
      *
-     * @phpstan-param TObject|array|mixed $criteria
-     * @phpstan-return TObject|null
+     * @phpstan-param Proxy<TProxiedObject>|array|mixed $criteria
+     * @phpstan-return Proxy<TProxiedObject>|null
      */
     public function find($criteria)
     {
@@ -201,10 +285,10 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         }
 
         if (!\is_array($criteria)) {
-            /** @var TObject|null $result */
-            $result = $this->repository->find($criteria);
+            /** @var TProxiedObject|null $result */
+            $result = $this->inner()->find($criteria);
 
-            return $result;
+            return $this->proxyResult($result);
         }
 
         $normalizedCriteria = [];
@@ -257,60 +341,82 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
     }
 
     /**
-     * @return list<TObject>
+     * @return list<Proxy<TProxiedObject>>
      */
     public function findAll(): array
     {
-        return $this->repository->findAll();
+        return $this->proxyResult($this->inner()->findAll());
     }
 
     /**
      * @param int|null $limit
      * @param int|null $offset
      *
-     * @return list<TObject>
+     * @return list<Proxy<TProxiedObject>>
      */
     public function findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null): array
     {
-        return $this->repository->findBy(self::normalizeCriteria($criteria), $orderBy, $limit, $offset);
+        return $this->proxyResult($this->inner()->findBy(self::normalizeCriteria($criteria), $orderBy, $limit, $offset));
     }
 
     /**
      * @param array|null $orderBy Some ObjectRepository's (ie Doctrine\ORM\EntityRepository) add this optional parameter
      *
-     * @return TObject|null
+     * @return (Proxy&TProxiedObject)|null
      *
      * @throws \RuntimeException if the wrapped ObjectRepository does not have the $orderBy parameter
+     *
+     * @phpstan-return Proxy<TProxiedObject>|null
      */
-    public function findOneBy(array $criteria, ?array $orderBy = null): ?object
+    public function findOneBy(array $criteria, ?array $orderBy = null): ?Proxy
     {
         if (null !== $orderBy) {
             trigger_deprecation('zenstruck\foundry', '1.37.0', 'Argument "$orderBy" of method "%s()" is deprecated and will be removed in Foundry 2.0. Use "%s::findBy()" instead if you need an order.', __METHOD__, __CLASS__);
         }
 
         if (\is_array($orderBy)) {
-            $wrappedParams = (new \ReflectionClass($this->repository))->getMethod('findOneBy')->getParameters();
+            $wrappedParams = (new \ReflectionClass($this->inner()))->getMethod('findOneBy')->getParameters();
 
             if (!isset($wrappedParams[1]) || 'orderBy' !== $wrappedParams[1]->getName() || !($type = $wrappedParams[1]->getType()) instanceof \ReflectionNamedType || 'array' !== $type->getName()) {
-                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', $this->repository::class));
+                throw new \RuntimeException(\sprintf('Wrapped repository\'s (%s) findOneBy method does not have an $orderBy parameter.', $this->inner()::class));
             }
         }
 
-        /** @var TObject|null $result */
-        $result = $this->repository->findOneBy(self::normalizeCriteria($criteria), $orderBy); // @phpstan-ignore-line
+        /** @var TProxiedObject|null $result */
+        $result = $this->inner()->findOneBy(self::normalizeCriteria($criteria), $orderBy); // @phpstan-ignore-line
         if (null === $result) {
             return null;
         }
 
-        return $result;
+        return $this->proxyResult($result);
     }
 
     /**
-     * @return class-string<TObject>
+     * @return class-string<TProxiedObject>
      */
     public function getClassName(): string
     {
-        return $this->repository->getClassName();
+        return $this->inner()->getClassName();
+    }
+
+    /**
+     * @param TProxiedObject|list<TProxiedObject>|null $result
+     *
+     * @return Proxy|Proxy[]|object|object[]|mixed
+     *
+     * @phpstan-return ($result is array ? list<Proxy<TProxiedObject>> : Proxy<TProxiedObject>)
+     */
+    private function proxyResult(mixed $result)
+    {
+        if (\is_array($result)) {
+            return \array_map(fn(mixed $o): mixed => $this->proxyResult($o), $result);
+        }
+
+        if ($result && \is_a($result, $this->getClassName())) {
+            return ProxyObject::createFromPersisted($result);
+        }
+
+        return $result;
     }
 
     private static function normalizeCriteria(array $criteria): array
@@ -326,3 +432,5 @@ class RepositoryDecorator implements ObjectRepository, \IteratorAggregate, \Coun
         return Factory::configuration()->objectManagerFor($this->getClassName());
     }
 }
+
+\class_exists(\Zenstruck\Foundry\RepositoryProxy::class);

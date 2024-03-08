@@ -14,9 +14,11 @@ namespace Zenstruck\Foundry\Tests\Functional;
 use PHPUnit\Framework\AssertionFailedError;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Zenstruck\Assert;
+use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
+use Zenstruck\Foundry\Tests\Fixtures\Entity\Post;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -135,6 +137,7 @@ abstract class ProxyTest extends KernelTestCase
      */
     public function can_force_set_multiple_fields(): void
     {
+        /** @var Proxy<Post> $post */
         $post = $this->postFactoryClass()::createOne(['title' => 'old title', 'body' => 'old body']);
         $post->_disableAutoRefresh();
 
@@ -275,6 +278,7 @@ abstract class ProxyTest extends KernelTestCase
         $this->assertSame('another new body', $post->getBody());
     }
 
+    /** @return class-string<PersistentProxyObjectFactory> */
     abstract protected function postFactoryClass(): string;
 
     abstract protected function postClass(): string;

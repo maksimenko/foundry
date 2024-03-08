@@ -123,7 +123,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::first()
+     * @see ProxyRepositoryDecorator::first()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -140,7 +140,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::last()
+     * @see ProxyRepositoryDecorator::last()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -157,7 +157,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::random()
+     * @see ProxyRepositoryDecorator::random()
      *
      * @return Proxy<TModel>&TModel
      * @phpstan-return Proxy<TModel>
@@ -183,7 +183,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::randomSet()
+     * @see ProxyRepositoryDecorator::randomSet()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -194,7 +194,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::randomRange()
+     * @see ProxyRepositoryDecorator::randomRange()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -205,7 +205,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::findAll()
+     * @see ProxyRepositoryDecorator::findAll()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -216,7 +216,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::find()
+     * @see ProxyRepositoryDecorator::find()
      *
      * @phpstan-param Proxy<TModel>|array|mixed $criteria
      * @phpstan-return Proxy<TModel>
@@ -235,7 +235,7 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     }
 
     /**
-     * @see RepositoryDecorator::findBy()
+     * @see ProxyRepositoryDecorator::findBy()
      *
      * @return list<TModel&Proxy<TModel>>
      * @phpstan-return list<Proxy<TModel>>
@@ -243,5 +243,13 @@ abstract class PersistentProxyObjectFactory extends PersistentObjectFactory
     final public static function findBy(array $attributes): array
     {
         return static::repository()->findBy($attributes);
+    }
+
+    /**
+     * @phpstan-return ProxyRepositoryDecorator<TModel>
+     */
+    final public static function repository(): ProxyRepositoryDecorator
+    {
+        return static::configuration()->repositoryFor(static::class(), proxy: true);
     }
 }

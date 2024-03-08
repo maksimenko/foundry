@@ -13,6 +13,7 @@ namespace Zenstruck\Foundry;
 
 use Faker;
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 use Zenstruck\Foundry\Proxy as ProxyObject;
 
@@ -146,11 +147,11 @@ function instantiate_many(int $number, string $class, array|callable $attributes
  *
  * @param TObject|class-string<TObject> $objectOrClass
  *
- * @return RepositoryDecorator<TObject>
+ * @return ProxyRepositoryDecorator<TObject>
  *
  * @deprecated
  */
-function repository(object|string $objectOrClass): RepositoryDecorator
+function repository(object|string $objectOrClass): ProxyRepositoryDecorator
 {
     trigger_deprecation('zenstruck\foundry', '1.37.0', 'Function "%s()" is deprecated and will be removed in Foundry 2.0. Use "Zenstruck\Foundry\Persistence\repository()" instead.', __FUNCTION__);
 
@@ -160,7 +161,7 @@ function repository(object|string $objectOrClass): RepositoryDecorator
         $objectOrClass = $objectOrClass::class;
     }
 
-    return \Zenstruck\Foundry\Persistence\repository($objectOrClass);
+    return \Zenstruck\Foundry\Persistence\proxy_repository($objectOrClass);
 }
 
 /**

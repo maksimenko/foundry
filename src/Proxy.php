@@ -19,6 +19,7 @@ use Zenstruck\Callback;
 use Zenstruck\Callback\Parameter;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 use Zenstruck\Foundry\Persistence\Proxy as ProxyBase;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 /**
@@ -155,7 +156,7 @@ final class Proxy implements \Stringable, ProxyBase
         }
 
         try {
-            $this->_refresh();
+            $this->_autoRefresh();
         } catch (\Throwable) {
         }
 
@@ -266,7 +267,7 @@ final class Proxy implements \Stringable, ProxyBase
 
     public function _set(string $property, mixed $value): static
     {
-        $this->_refresh();
+        $this->_autoRefresh();
         $object = $this->_real();
 
         Instantiator::forceSet($object, $property, $value, calledInternally: true);
@@ -302,22 +303,23 @@ final class Proxy implements \Stringable, ProxyBase
 
     public function _get(string $property): mixed
     {
+        $this->_autoRefresh();
         return Instantiator::forceGet($this->_real(), $property, calledInternally: true);
     }
 
     /**
      * @deprecated Use method "_repository()" instead
      */
-    public function repository(): RepositoryDecorator
+    public function repository(): ProxyRepositoryDecorator
     {
         trigger_deprecation('zenstruck\foundry', '1.37.0', 'Method "%s()" is deprecated and will be removed in 2.0. Use "%s::_repository()" instead.', __METHOD__, self::class);
 
         return $this->_repository();
     }
 
-    public function _repository(): RepositoryDecorator
+    public function _repository(): ProxyRepositoryDecorator
     {
-        return Factory::configuration()->repositoryFor($this->class);
+        return Factory::configuration()->repositoryFor($this->class, proxy: true);
     }
 
     /**
@@ -447,5 +449,14 @@ final class Proxy implements \Stringable, ProxyBase
         }
 
         return Factory::configuration()->objectManagerFor($this->class);
+    }
+
+    private function _autoRefresh(): void
+    {
+        if (!$this->autoRefresh) {
+            return;
+        }
+
+        $this->_refresh();
     }
 }

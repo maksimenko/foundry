@@ -12,6 +12,7 @@
 namespace Zenstruck\Foundry;
 
 use Zenstruck\Foundry\Persistence\Proxy;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryAssertions;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
@@ -199,10 +200,10 @@ final class AnonymousFactory extends Factory implements \Countable, \IteratorAgg
     }
 
     /**
-     * @phpstan-return RepositoryDecorator<TModel>
+     * @phpstan-return ProxyRepositoryDecorator<TModel>
      */
-    public function repository(): RepositoryDecorator
+    public function repository(): ProxyRepositoryDecorator
     {
-        return self::configuration()->repositoryFor($this->class);
+        return self::configuration()->repositoryFor($this->class, proxy: true);
     }
 }

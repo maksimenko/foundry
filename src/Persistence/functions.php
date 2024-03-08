@@ -26,7 +26,20 @@ use Zenstruck\Foundry\Proxy as LegacyProxy;
  */
 function repository(string $class): RepositoryDecorator
 {
-    return Factory::configuration()->repositoryFor($class);
+    return Factory::configuration()->repositoryFor($class, proxy: false);
+}
+
+/**
+ * @param class-string<TObject> $class
+ *
+ * @return ProxyRepositoryDecorator<TObject>
+ * @see Configuration::repositoryFor()
+ *
+ * @template TObject of object
+ */
+function proxy_repository(string $class): ProxyRepositoryDecorator
+{
+    return Factory::configuration()->repositoryFor($class, proxy: true);
 }
 
 /**

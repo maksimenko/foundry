@@ -25,6 +25,7 @@ use Symplify\RuleDocGenerator\ValueObject\RuleDefinition;
 use Zenstruck\Foundry\ModelFactory;
 use Zenstruck\Foundry\ObjectFactory;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
+use Zenstruck\Foundry\Persistence\ProxyRepositoryDecorator;
 use Zenstruck\Foundry\Persistence\RepositoryDecorator;
 
 final class ChangeFactoryBaseClass extends AbstractRector
@@ -295,14 +296,14 @@ final class ChangeFactoryBaseClass extends AbstractRector
                 }
 
                 match(true){
-                    $methodNode->returnType instanceof IdentifierTypeNode => $methodNode->returnType = new IdentifierTypeNode('\\'.RepositoryDecorator::class),
-                    $methodNode->returnType instanceof GenericTypeNode => $methodNode->returnType->type = new IdentifierTypeNode('\\'.RepositoryDecorator::class),
+                    $methodNode->returnType instanceof IdentifierTypeNode => $methodNode->returnType = new IdentifierTypeNode('\\'.ProxyRepositoryDecorator::class),
+                    $methodNode->returnType instanceof GenericTypeNode => $methodNode->returnType->type = new IdentifierTypeNode('\\'.ProxyRepositoryDecorator::class),
                     $methodNode->returnType instanceof UnionTypeNode => (static function() use ($methodNode){
                         foreach ($methodNode->returnType->types as $key => $type) {
                             if ($type instanceof IdentifierTypeNode && str_contains($type->name, 'RepositoryProxy')) {
                                 // does not work by just updating node's name
                                 unset($methodNode->returnType->types[$key]);
-                                $methodNode->returnType->types[] = new IdentifierTypeNode('\\'.RepositoryDecorator::class);
+                                $methodNode->returnType->types[] = new IdentifierTypeNode('\\'.ProxyRepositoryDecorator::class);
                             }
                         }
                     })(),

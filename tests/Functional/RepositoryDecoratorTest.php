@@ -20,7 +20,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Zenstruck\Foundry\Tests\Fixtures\Entity\Category;
 
-use function Zenstruck\Foundry\Persistence\repository;
+use function Zenstruck\Foundry\Persistence\proxy_repository;
 
 /**
  * @author Kevin Bond <kevinbond@gmail.com>
@@ -34,7 +34,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
      */
     public function assertions(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
         $repository->assert()->empty();
 
@@ -96,7 +96,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
      */
     public function assertions_legacy(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
         $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertEmpty() is deprecated, use RepositoryDecorator::assert()->empty().');
         $this->expectDeprecation('Since zenstruck\foundry 1.8.0: Using RepositoryDecorator::assertCount() is deprecated, use RepositoryDecorator::assert()->count().');
@@ -121,7 +121,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
      */
     public function can_fetch_objects(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
 
         $this->categoryFactoryClass()::createMany(2);
 
@@ -141,7 +141,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
      */
     public function find_can_be_passed_proxy_or_object_or_array(): void
     {
-        $repository = repository($this->categoryClass());
+        $repository = proxy_repository($this->categoryClass());
         $proxy = $this->categoryFactoryClass()::createOne(['name' => 'foo']);
 
         $this->assertInstanceOf(Proxy::class, $repository->find(['name' => 'foo']));
@@ -162,7 +162,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $ids = [];
 
         while (5 !== \count(\array_unique($ids))) {
-            $ids[] = repository($this->categoryClass())->random()->getId();
+            $ids[] = proxy_repository($this->categoryClass())->random()->getId();
         }
 
         $this->assertCount(5, \array_unique($ids));
@@ -176,7 +176,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 1 "%s" object(s) must have been persisted (0 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->random();
+        proxy_repository($this->categoryClass())->random();
     }
 
     /**
@@ -186,7 +186,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
     {
         $this->categoryFactoryClass()::createMany(5);
 
-        $objects = repository($this->categoryClass())->randomSet(3);
+        $objects = proxy_repository($this->categoryClass())->randomSet(3);
 
         $this->assertCount(3, $objects);
         $this->assertCount(
@@ -208,7 +208,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$number must be positive (-1 given).');
 
-        repository($this->categoryClass())->randomSet(-1);
+        proxy_repository($this->categoryClass())->randomSet(-1);
     }
 
     /**
@@ -221,7 +221,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->randomSet(2);
+        proxy_repository($this->categoryClass())->randomSet(2);
     }
 
     /**
@@ -234,7 +234,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $counts = [];
 
         while (4 !== \count(\array_unique($counts))) {
-            $counts[] = \count(repository($this->categoryClass())->randomRange(0, 3));
+            $counts[] = \count(proxy_repository($this->categoryClass())->randomRange(0, 3));
         }
 
         $this->assertCount(4, \array_unique($counts));
@@ -256,7 +256,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(\sprintf('At least 2 "%s" object(s) must have been persisted (1 persisted).', $this->categoryClass()));
 
-        repository($this->categoryClass())->randomRange(0, 2);
+        proxy_repository($this->categoryClass())->randomRange(0, 2);
     }
 
     /**
@@ -267,7 +267,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$min must be positive (-1 given).');
 
-        repository($this->categoryClass())->randomRange(-1, 3);
+        proxy_repository($this->categoryClass())->randomRange(-1, 3);
     }
 
     /**
@@ -278,7 +278,7 @@ abstract class RepositoryDecoratorTest extends KernelTestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('$max (3) cannot be less than $min (5).');
 
-        repository($this->categoryClass())->randomRange(5, 3);
+        proxy_repository($this->categoryClass())->randomRange(5, 3);
     }
 
     /**
