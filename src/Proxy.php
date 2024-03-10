@@ -296,7 +296,11 @@ final class Proxy implements \Stringable
                 $id = $classMetadata->getIdentifierValue($this->object);
             }
         } else {
-            $id = $objectManager->getClassMetadata($this->class)->getIdentifierValues($this->object);
+            $classMetadata = $objectManager->getClassMetadata($this->class);
+            if (empty($classMetadata->getIdentifierFieldNames())) {
+                return null;
+            }
+            $id = $classMetadata->getIdentifierValues($this->object);
         }
 
         return empty($id) ? null : $objectManager->find($this->class, $id);
